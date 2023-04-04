@@ -4,15 +4,18 @@ use "buffered"
 
 class SMTPClientNotify is TCPConnectionNotify
   var client_state: SMTPClientState = SMTPClientStateNoConnection
-  let config: SMTPConfiguration
+  let config: SMTPConfiguration val
   let reader: Reader = Reader
-  let email: EMail val
+  var email: EMail iso
   var rcpttos: Array[String] = []
   var currentto: String val = ""
 
-  new create(config': SMTPConfiguration, email': EMail val) =>
+  new create(config': SMTPConfiguration val, email': EMail iso) =>
     config = config'
-    email = email'
+    Debug.out("SMTPConfiguration:mydomain: " + config.mydomain)
+    Debug.out("SMTPConfiguration:destination: " + config.destination)
+    Debug.out("SMTPConfiguration:port: " + config.port)
+    email = consume email'
 
     for to in email.to.values() do
       rcpttos.push(to)
@@ -24,7 +27,10 @@ class SMTPClientNotify is TCPConnectionNotify
       rcpttos.push(bcc)
     end
 
-  fun ref connect_failed(conn: TCPConnection ref) => None
+  fun ref connect_failed(conn: TCPConnection ref) =>
+    var temail: EMail iso = email = recover iso EMail end
+    config.callback(consume temail)
+
   fun ref connected(conn: TCPConnection ref) =>
     Debug.out("←→ Connection Established with " + config.destination)
   fun ref sent(conn: TCPConnection ref, data: ByteSeq): ByteSeq =>
@@ -45,7 +51,9 @@ class SMTPClientNotify is TCPConnectionNotify
     | let x: SMTPClientStatePendingOK => recv_pending_ok(conn)
     end
     true
-  fun ref closed(conn: TCPConnection ref) => None
+  fun ref closed(conn: TCPConnection ref) =>
+    var temail: EMail iso = email = recover iso EMail end
+    config.callback(consume temail)
 
   fun ref recv_pending_ok(conn: TCPConnection ref) =>
     try

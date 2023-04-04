@@ -3,13 +3,13 @@ use "encode/base64"
 class EMail
   var contents: Array[MIMEContent val] = []
   var boundary: String = "lqwkejhdlkjqewhdlhdlkjhqewdljkqwgfvedyugqewukdgqewklugqwFIXME"
-  var to: Array[String] = []
-  var cc: Array[String] = []
-  var bcc: Array[String] = []
-  var subject: String = ""
-  var from: String = "test@example.com"
+  var to: Array[String val] val = []
+  var cc: Array[String val] val = []
+  var bcc: Array[String val] val = []
+  var subject: String val = ""
+  var from: String val = ""
 
-
+  new iso create() => None
 
   fun render(): String =>
     render_headers() +
