@@ -1,11 +1,21 @@
+use "collections"
 use "encode/base64"
 
 class EMail
+  """
+  This class represents a single EMail.  It contains as fields:
+
+  * To, Cc, Bcc values.
+  * Subject
+  * From
+  * Array[MIMEContent val] which contains all of the text/images/attachments
+  """
+
   var contents: Array[MIMEContent val] = []
   var boundary: String = "lqwkejhdlkjqewhdlhdlkjhqewdljkqwgfvedyugqewukdgqewklugqwFIXME"
-  var to: Array[String val] val = []
-  var cc: Array[String val] val = []
-  var bcc: Array[String val] val = []
+  var to: Map[String val, String val] val = Map[String val, String val]
+  var cc: Map[String val, String val] val = Map[String val, String val]
+  var bcc: Map[String val, String val] val = Map[String val, String val]
   var subject: String val = ""
   var from: String val = ""
 
@@ -17,8 +27,8 @@ class EMail
     "--" + boundary + "--\r\n"
 
   fun render_headers(): String =>
-    "To: " + ", ".join(to.values()) + "\r\n" +
-    "Cc: " + ", ".join(cc.values()) + "\r\n" +
+    "To: " + ", ".join(to.keys()) + "\r\n" +
+    "Cc: " + ", ".join(cc.keys()) + "\r\n" +
     "Subject: " + subject + "\r\n" +
     "Content-Type: multipart/alternative; boundary=" + boundary + "\r\n" +
     "Mime-Version: 1.0\r\n\r\n"

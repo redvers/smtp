@@ -1,10 +1,15 @@
 use "net"
 use "smtp"
 use "debug"
+use "buffered"
+use "collections"
 use "encode/base64"
 
 actor Main
-  new create(env: Env) =>
+  let env: Env
+  new create(env': Env) =>
+    env = env'
+
     let text: String =
     """
       These documents are based on earlier work documented in RFC 934, STD
@@ -31,7 +36,7 @@ actor Main
     var email: EMail iso = recover iso
       let email': EMail = EMail
       email'.contents.push(content)
-      email'.to = ["red@example.com"]
+      email'.to = recover val Map[String val, String val].>insert("red@example.com", "") end
       email'.from = "red@example.com"
       email'.subject = "This is a test email from Pony"
       consume email'
@@ -43,5 +48,10 @@ actor Main
 
     let smtp: SMTPClient = SMTPClient(TCPConnectAuth(env.root), smtpconfig, consume email)
 
-  be callback(email: EMail val) =>
-    Debug.out("We have exitted")
+  be callback(email: EMail val, sessionlog: Reader iso) =>
+    env.out.print("hit the callback()")
+    try
+      while true do
+        env.out.print(sessionlog.line()?)
+      end
+    end
